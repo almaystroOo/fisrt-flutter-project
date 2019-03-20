@@ -12,9 +12,13 @@ class AuthPage extends StatefulWidget {
 class _AuthPage extends State<AuthPage> {
   String _userName;
   String _password;
-  bool _terms = false;
-
-  final GlobalKey<FormState> _formkey = GlobalKey();
+  bool _terms = true;
+  final Map<String, dynamic> _formData = {
+    'email': null,
+    'password': null,
+    'acceptTerms': true
+  };
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   DecorationImage _buildBckgroundImage() {
     return DecorationImage(
       image: AssetImage(
@@ -38,16 +42,15 @@ class _AuthPage extends State<AuthPage> {
     return TextFormField(
       autovalidate: true,
       validator: (value) {
-        if ( value.isEmpty || ! RegExp(r'^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$')
-                .hasMatch(value)){
-                  return'Enter a valid Email address';
-                }
-
-        
+        if (value.isEmpty ||
+            !RegExp(r'^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$')
+                .hasMatch(value)) {
+          return 'Enter a valid Email address';
+        }
       },
       onSaved: (String value) {
         setState(() {
-          _userName = value;
+          _formData['email'] = value;
         });
       },
       //  textInputAction: TextInputAction.next,
@@ -68,13 +71,11 @@ class _AuthPage extends State<AuthPage> {
       obscureText: false,
       validator: (value) {
         if (value.isEmpty) {
-         return'Password required';
+          return 'Password required';
         }
       },
       onSaved: (String value) {
-      
-          _password = value;
-       
+        _formData['password'] = value;
       },
 
       textInputAction: TextInputAction.next,
@@ -95,7 +96,7 @@ class _AuthPage extends State<AuthPage> {
       value: _terms,
       onChanged: (bool value) {
         setState(() {
-          _terms = value;
+          _formData['acceptTerms'] = value;
         });
       },
       title: Text("I Accept Terms"),
@@ -103,7 +104,9 @@ class _AuthPage extends State<AuthPage> {
   }
 
   void _signinForm() {
-    _formkey.currentState.validate();
+    if (!_formkey.currentState.validate() || !_formData['acceptTerms']) {
+      return;
+    }
     _formkey.currentState.save();
     Navigator.pushReplacementNamed(context, '/hom');
 

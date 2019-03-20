@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import './price_tag.dart';
 import '../ui_elements/defult_title.dart';
 import './address_tag.dart';
-
+import '../../models/product.dart';
 class ProductCard extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
   final int productindex;
   final String address = " Sudan,Khartoum - Kalakla  ";
   ProductCard(this.product, this.productindex);
   Widget _buildImage() {
-    return Image.asset(product['image']);
+    return Image.asset(product.image);
   }
 
   void _buildDetails(BuildContext context) {
@@ -23,12 +23,12 @@ class ProductCard extends StatelessWidget {
       children: <Widget>[
         Container(
           alignment: Alignment.center,
-          child: DefultTilte(product['title']),
+          child: DefultTilte(product.title),
         ),
         SizedBox(
           width: 15.0,
         ),
-        PriceTag(product['price']),
+        PriceTag(product.price),
       ],
     );
   }

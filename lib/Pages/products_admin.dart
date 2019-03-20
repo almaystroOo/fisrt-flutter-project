@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 import './Product_edit.dart';
 import './Product_list.dart';
+import '../models/product.dart';
 
 class ProductsAdminPage extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
-
+  final List<Product> products;
+  final Function updateProduct;
   final Function addProduct;
-  ProductsAdminPage(this.addProduct, this.products);
+  final Function deleteProduct;
+  ProductsAdminPage({this.addProduct,this.updateProduct, this.products,this.deleteProduct});
   Widget _drawer(BuildContext context) {
     return Drawer(
       child: Column(
@@ -53,8 +55,8 @@ class ProductsAdminPage extends StatelessWidget {
         backgroundColor: Colors.blueGrey[200],
         body: TabBarView(
           children: <Widget>[
-            ProductEdit(addProduct:addProduct),
-            ProducList(products),
+            ProductEdit(addProduct: addProduct),
+            ProducList(products , updateProduct,deleteProduct),
           ],
         ),
       ),

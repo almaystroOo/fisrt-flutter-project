@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import './Product_list.dart';
+import '../models/product.dart';
 
 class ProductEdit extends StatefulWidget {
- final Map<String, dynamic> products;
- final Function updateProduct;
+  final Product products;
+  final Function updateProduct;
   final Function addProduct;
-  ProductEdit({this.addProduct,this.updateProduct,this.products});
+  final int productIndex;
+  ProductEdit(
+      {this.addProduct, this.updateProduct, this.products, this.productIndex});
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -19,15 +23,15 @@ class _ProductEditState extends State<ProductEdit> {
   final Map<String, dynamic> _formData = {
     'title': '',
     'image': 'assets/bmi.jpg',
-    'description': '',
+    'discription': '',
     'price': 0,
   };
-  final _createForm = GlobalKey<FormState>();
+  final GlobalKey<FormState> _createForm = GlobalKey<FormState>();
 
   Widget _buildTitleField() {
     return TextFormField(
       //controller: _ageController,
-     // initialValue: widget.products,
+      initialValue: widget.products == null ? '' : widget.products.title,
       validator: (String value) {
         if (value.isEmpty) {
           return 'required';
@@ -51,6 +55,7 @@ class _ProductEditState extends State<ProductEdit> {
   Widget _buildDiscriptionField() {
     return TextFormField(
 //controller: _ageController,
+      initialValue: widget.products == null ? '' : widget.products.discription,
       validator: (String value) {
         if (!value.isNotEmpty) {
           return 'required';
@@ -74,6 +79,8 @@ class _ProductEditState extends State<ProductEdit> {
   Widget _buildPriceField() {
     return TextFormField(
       //controller: _ageController,
+      initialValue:
+          widget.products == null ? '' : widget.products.price.toString(),
       validator: (String value) {
         if (!value.isNotEmpty ||
             !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
@@ -96,26 +103,54 @@ class _ProductEditState extends State<ProductEdit> {
     );
   }
 
-  void _submitform() {
-    _createForm.currentState.validate();
-    _createForm.currentState.save();
-
-    widget.addProduct(_formData);
-    Navigator.pushReplacementNamed(context, '/hom');
+  Widget _createButton() {
+    return RaisedButton(
+      color: Theme.of(context).accentColor,
+      onPressed: _submitform,
+      child: Text("Create"),
+    );
   }
 
+  Widget _updateButton() {
+    return RaisedButton(
+      color: Theme.of(context).accentColor,
+      onPressed: _submitform,
+      child: Text("Update"),
+    );
+  }
 
-
-
-
-
-
-
+  void _submitform() {
+    if (!_createForm.currentState.validate()) {
+      return;
+    }
+    _createForm.currentState.save();
+    if (widget.products == null) {
+      widget.addProduct(Product(
+          title: _formData['title'],
+          discription: _formData['discription'],
+          image: _formData['image'],
+          price: _formData['price']));
+      // Navigator.pushReplacementNamed(context, '/hom');
+    } else {
+      widget.updateProduct(
+          widget.productIndex,
+          Product(
+              title: _formData['title'],
+              discription: _formData['discription'],
+              image: _formData['image'],
+              price: _formData['price']));
+      // Navigator.pushReplacementNamed(context, '/edit');
+    }
+    Navigator.pushReplacementNamed(context, '/hom');
+    //of(context).pop(MaterialPageRoute(
+    //   builder: (BuildContext context){
+    //     return ProducList(products, updateProduct)});
+  }
 
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double targetWidth = width > 550.0 ? 500 : width * 0.98;
-    final Widget pageContent= Scaffold(
+    final Widget pageContent = Scaffold(
       backgroundColor: Colors.blueGrey[200],
       body: Container(
         width: targetWidth,
@@ -133,11 +168,7 @@ class _ProductEditState extends State<ProductEdit> {
                 height: 10.0,
                 //width: 2.0,
               ),
-              RaisedButton(
-                color: Theme.of(context).accentColor,
-                onPressed: _submitform,
-                child: Text("Create"),
-              ),
+              widget.products == null ? _createButton() : _updateButton(),
 
               // TextField(
               //   onChanged: (String value)=>{
@@ -162,18 +193,18 @@ class _ProductEditState extends State<ProductEdit> {
           ),
         ),
       ),
-    ); 
-    return widget.products==null ? pageContent : Scaffold(
-     appBar: AppBar(
-          title: Text(
-            "Product Edit",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          backgroundColor: Theme.of(context).primaryColor,
-         
-        ),
-        backgroundColor: Colors.blueGrey[200],
-        body: pageContent
     );
+    return widget.products == null
+        ? pageContent
+        : Scaffold(
+            appBar: new AppBar(
+              title: Text(
+                "Product Edit",
+                // style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
+            backgroundColor: Colors.blueGrey[200],
+            body: pageContent);
   }
 }
